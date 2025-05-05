@@ -4,15 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="Initial commit">
-      <change afterPath="$PROJECT_DIR$/Mesurment/PressureMeasurment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/PressureMesurments.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PressureMesurments.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Stabilisation_atomic_json.py" beforeDir="false" afterPath="$PROJECT_DIR$/Stabilization/Stabilisation_atomic_json.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Stabilisation_history_json.py" beforeDir="false" afterPath="$PROJECT_DIR$/Stabilization/Stabilisation_history_json.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Stabilisation_simple_json.py" beforeDir="false" afterPath="$PROJECT_DIR$/Stabilization/Stabilisation_simple_json.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="some changes">
+      <change beforePath="$PROJECT_DIR$/Mesurment/PressureMeasurment.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mesurment/PressureMeasurment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ploting/UniversalPlotter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Ploting/UniversalPlotter.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,7 +119,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746263772814</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="some changes">
+      <option name="closed" value="true" />
+      <created>1746430301669</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1746430301669</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -141,7 +143,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial commit" />
+    <MESSAGE value="some changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="some changes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
