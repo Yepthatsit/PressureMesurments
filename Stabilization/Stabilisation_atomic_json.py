@@ -78,11 +78,12 @@ class TemperatureStabilizer:
 
         # connect to the Lakeshore instrument
         try:
-            self.lakeshore:LakeShore331 = instrument
+            self.lakeshore = instrument
             self.logger.info(f"Connected to Lakeshore")
         except Exception as e:
             self.logger.error(f"Failed to connect to Lakeshore: {e}")
             raise
+        
 
     def __enter__(self):
         return self
@@ -121,7 +122,7 @@ class TemperatureStabilizer:
         :raises: VisaIOError if communication fails.
         """
         try:
-            response = self.lakeshore.ask("KRDG? B", query_delay=0.2)
+            response = self.lakeshore.ask(command="KRDG? B")
             temp = float(response)
             self.logger.debug(f"Measured temperature: {temp:.4f} K")
             return temp

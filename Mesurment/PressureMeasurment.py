@@ -1,9 +1,8 @@
 import numpy as np
-from pyqtgraph.examples.hdf5 import fileName
 from typing_extensions import Required
 from pymeasure.instruments.lakeshore import lakeshore331, LakeShore331
 from pymeasure.instruments.srs import  SR860
-from Stabilization.Stabilisation_atomic_json import  TemperatureStabilizer
+from Stabilization.Stabilisation_atomic_json import TemperatureStabilizer
 from time import  sleep
 import datetime
 import  subprocess
@@ -41,18 +40,18 @@ class PressureMesurment:
         ParametersMeasured.append(self.Lakeshore.ask("KRDG? A"))
         ParametersMeasured.append(self.Lakeshore.ask("KRDG? B"))
         ParametersMeasured.append(self.Lakeshore.ask("SETP? 1"))
-        ParametersMeasured.append(self.LockIn.x)
-        ParametersMeasured.append(self.LockIn.y)
-        ParametersMeasured.append(self.LockIn.frequency)
-        ParametersMeasured.append(self.LockIn.sine_voltage)
-        ParametersMeasured.append(self.LockIn.theta)
-        ParametersMeasured.append(self.LockIn.phase)
-        ParametersMeasured.append(self.LockIn.magnitude)
-        ParametersMeasured.append(self.Lakeshore.ask("HTR?"))
-        ParametersMeasured.append(mesurmentNumber)
-        ParametersMeasured.append(datetime.date)
-        ParametersMeasured.append(datetime.time)
-        pass
+        ParametersMeasured.append(str(self.LockIn.x))
+        ParametersMeasured.append(str(self.LockIn.y))
+        ParametersMeasured.append(str(self.LockIn.frequency))
+        ParametersMeasured.append(str(self.LockIn.sine_voltage))
+        ParametersMeasured.append(str(self.LockIn.theta))
+        ParametersMeasured.append(str(self.LockIn.phase))
+        ParametersMeasured.append(str(self.LockIn.magnitude))
+        ParametersMeasured.append(str(self.Lakeshore.ask("HTR?")))
+        ParametersMeasured.append(str(mesurmentNumber))
+        now = datetime.datetime.now()
+        ParametersMeasured.append(now.strftime("%Y-%m-%d %H:%M:%S.") + f"{now.microsecond // 10:05d}")
+        return ParametersMeasured
     def GoToTemperature(self, FileName:Required[str], TargetTemp:Required[float], Ramp:float = 4, SampleTemperatureTolerance:float = 0.5 , ControlTemperatureTolerance:float = 0.5, MeasurmentDelay:float = 5) -> None:
         """
         :param FileName:
@@ -64,35 +63,37 @@ class PressureMesurment:
         """
         fileDir = os.path.dirname(FileName)
         mesurmentNumber = 1
-        if(not os.path.exists(fileDir)):
+        if(not os.path.exists(fileDir) and fileDir != ""):
             print(f"Creating directory: {fileDir}")
             os.mkdir(fileDir)
         if(not os.path.exists(FileName)):
             file = open(FileName,"w")
             file.write("T_A[K] T_B[K] Setpoint[K] SR860x[V] SR860y[V] SR860f[Hz] SR860sin[V] SR860tht[deg] SR860phs[deg] SR860mgn[V] HTR CNT yyyy-mm-dd hh:mm:ss.ccccc")
             file.close()
-        TempControl = self.Lakeshore.input_B.temperature
-        TempSample = self.Lakeshore.input_A.temperature
+        TempControl = float(self.Lakeshore.ask("KRDG? B"))
+        TempSample = float(self.Lakeshore.ask("KRDG? A"))
         self.Lakeshore.write(f"RAMP 1,1,{Ramp}")
         self.Lakeshore.write(f"SETP 1,{TargetTemp}")
-        process = subprocess.Popen(f"python /Ploting/UniversalPlotter.py {fileName} T_A[K],SR860x[V]")
+        #process = subprocess.Popen(f"python /Ploting/UniversalPlotter.py {FileName} T_A[K],SR860x[V]")
 
         while(abs(TempControl - TargetTemp) > ControlTemperatureTolerance or abs(TempSample - TargetTemp) > SampleTemperatureTolerance ):
-            TempSample = self.Lakeshore.input_A.temperature
-            TempControl = self.Lakeshore.input_B.temperature
+            TempControl = float(self.Lakeshore.ask("KRDG? B"))
+            TempSample = float(self.Lakeshore.ask("KRDG? A"))
             ParametersMeasured = self.__GetFullParametersList(mesurmentNumber)
-            file = open(fileName,'a')
-            file.write(" ".join(ParametersMeasured) + "\n")
+            file = open(FileName,'a')
+            values = " ".join(ParametersMeasured) + "\n"
+            print(values)
+            file.write(values)
             file.close()
             sleep(MeasurmentDelay)
-        process.terminate()
+        #process.terminate()
 
     def StabilizationMesurment(self,FileName:Required[str], StartTemp:Required[float], EndTemp:Required[float], NumberOfPoints:Required[int]):
         temperatures = list(np.linspace(StartTemp,EndTemp,NumberOfPoints))
         temperatures = temperatures + temperatures[1::-1]
         fileDir = os.path.dirname(FileName)
         mesurmentNumber = 1
-        if (not os.path.exists(fileDir)):
+        if (not os.path.exists(fileDir)  and fileDir != ""):
             print(f"Creating directory: {fileDir}")
             os.mkdir(fileDir)
         if (not os.path.exists(FileName)):
@@ -101,13 +102,13 @@ class PressureMesurment:
                 "T_A[K] T_B[K] Setpoint[K] SR860x[V] SR860y[V] SR860f[Hz] SR860sin[V] SR860tht[deg] SR860phs[deg] SR860mgn[V] HTR CNT yyyy-mm-dd hh:mm:ss.ccccc")
             file.close()
         mainFolder = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'UtilityFiles'))
-        Stabilizer = TemperatureStabilizer(LakeShore331,os.path.join(mainFolder,"Stabilization.json"),nb_points_stabilisation=self.NumOfStabPoints,
-                                           sampling_time=self.SplTime,tolerance_A=self.SlopeTolerance,tolerance_B=self.InterceptTolerance),
+        Stabilizer = TemperatureStabilizer(self.Lakeshore,os.path.join(mainFolder,"Stabilization.json"),0,nb_points_stabilisation=self.NumOfStabPoints,
+                                           sampling_time=self.SplTime,tolerance_A=self.SlopeTolerance,tolerance_B=self.InterceptTolerance)
 
         for temperature in temperatures:
-            Stabilizer.set_Setpoint(temperature)
+            Stabilizer.set_setpoint(temperature)
             self.Lakeshore.write(f"SETP 1,{temperature}")
-            while not Stabilizer.check_stabilization():
+            while not Stabilizer.check_stabilisation():
                 pass
             parameters = self.__GetFullParametersList()
             file = open(FileName,'a')
