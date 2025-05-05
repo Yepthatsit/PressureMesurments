@@ -78,7 +78,7 @@ class TemperatureStabilizer:
 
         # connect to the Lakeshore instrument
         try:
-            self.lakeshore:LakeShore331 = LakeShore331
+            self.lakeshore:LakeShore331 = instrument
             self.logger.info(f"Connected to Lakeshore")
         except Exception as e:
             self.logger.error(f"Failed to connect to Lakeshore: {e}")
