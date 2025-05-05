@@ -3,7 +3,7 @@ import json
 import time
 import logging
 import tempfile
-from typing import List, Tuple, Optional, Dict, Any
+from typing import List, Tuple, Optional, Dict, Any, Required
 
 import numpy as np
 import pyvisa.errors as visa_errors
@@ -19,7 +19,7 @@ class TemperatureStabilizer:
 
     def __init__(
         self,
-        instrument_address: str,
+        instrument: Required[LakeShore331],
         json_filepath: str,
         setpoint: float,
         nb_points_stabilisation: int,
@@ -78,8 +78,8 @@ class TemperatureStabilizer:
 
         # connect to the Lakeshore instrument
         try:
-            self.lakeshore = LakeShore331(instrument_address)
-            self.logger.info(f"Connected to Lakeshore at {instrument_address}")
+            self.lakeshore:LakeShore331 = LakeShore331
+            self.logger.info(f"Connected to Lakeshore")
         except Exception as e:
             self.logger.error(f"Failed to connect to Lakeshore: {e}")
             raise
