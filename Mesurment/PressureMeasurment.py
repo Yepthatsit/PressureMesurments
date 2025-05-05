@@ -74,7 +74,7 @@ class PressureMesurment:
         TempSample = float(self.Lakeshore.ask("KRDG? A"))
         self.Lakeshore.write(f"RAMP 1,1,{Ramp}")
         self.Lakeshore.write(f"SETP 1,{TargetTemp}")
-        #process = subprocess.Popen(f"python /Ploting/UniversalPlotter.py {FileName} T_A[K],SR860x[V]")
+        process = subprocess.Popen(f"py ../Ploting/UniversalPlotter.py {FileName} T_A[K],SR860x[V]")
 
         while(abs(TempControl - TargetTemp) > ControlTemperatureTolerance or abs(TempSample - TargetTemp) > SampleTemperatureTolerance ):
             TempControl = float(self.Lakeshore.ask("KRDG? B"))
@@ -86,7 +86,7 @@ class PressureMesurment:
             file.write(values)
             file.close()
             sleep(MeasurmentDelay)
-        #process.terminate()
+        process.terminate()
 
     def StabilizationMesurment(self,FileName:Required[str], StartTemp:Required[float], EndTemp:Required[float], NumberOfPoints:Required[int]):
         temperatures = list(np.linspace(StartTemp,EndTemp,NumberOfPoints))
@@ -104,7 +104,7 @@ class PressureMesurment:
         mainFolder = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'UtilityFiles'))
         Stabilizer = TemperatureStabilizer(self.Lakeshore,os.path.join(mainFolder,"Stabilization.json"),0,nb_points_stabilisation=self.NumOfStabPoints,
                                            sampling_time=self.SplTime,tolerance_A=self.SlopeTolerance,tolerance_B=self.InterceptTolerance)
-
+        process = subprocess.Popen(f"py ../Ploting/UniversalPlotter.py {FileName} T_A[K],SR860x[V]")
         for temperature in temperatures:
             Stabilizer.set_setpoint(temperature)
             self.Lakeshore.write(f"SETP 1,{temperature}")
@@ -114,5 +114,7 @@ class PressureMesurment:
             file = open(FileName,'a')
             file.write(" ".join(parameters) + "\n")
             file.close()
+
+        process.terminate()
 
         pass
