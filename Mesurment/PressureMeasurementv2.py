@@ -221,7 +221,7 @@ class PressureMeasurement:
         sweep = forward + forward[::-1][1:]
 
         # Build the absolute path to the stabilizer's JSON configuration file
-        cfg_path = os.path.join(BASE_DIR, "UtilityFiles", "Stabilization.json")
+        cfg_path = os.path.join(BASE_DIR,'..', "UtilityFiles", "Stabilization.json")
 
         # Use the TemperatureStabilizer context manager to handle setup and cleanup
         with TemperatureStabilizer(
