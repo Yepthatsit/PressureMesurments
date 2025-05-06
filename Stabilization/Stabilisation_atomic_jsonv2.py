@@ -146,7 +146,7 @@ class TemperatureStabilizer:
         """
         json_dir = os.path.dirname(self.json_filepath)
         with tempfile.NamedTemporaryFile(
-            mode='w', dir=json_dir or '.', delete=False
+            mode='w', dir=json_dir or './'
         ) as tmp:
             json.dump(data, tmp, indent=4)
             temp_name = tmp.name

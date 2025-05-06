@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="ploting working">
-      <change afterPath="$PROJECT_DIR$/Ploting/JsonPlotter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="ploting working" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -213,7 +210,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746479260582</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="ploting working">
+      <option name="closed" value="true" />
+      <created>1746537149026</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1746537149027</updated>
+    </task>
+    <task id="LOCAL-00008" summary="ploting working">
+      <option name="closed" value="true" />
+      <created>1746537681561</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1746537681561</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
