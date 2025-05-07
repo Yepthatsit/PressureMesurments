@@ -1,5 +1,5 @@
 import os
-from Stabilization.Stabilisation_atomic_jsonv2 import MeasurementConfig,configure_class_logger,TemperatureStabilizer
+from Stabilization.Stabilisation_atomic_jsonv3 import MeasurementConfig,configure_class_logger,TemperatureStabilizer
 import datetime
 import time
 import numpy as np
@@ -23,9 +23,9 @@ class PressureMeasurement:
 
     HEADER: Required[str] = (
         "T_A[K] T_B[K] Setpoint[K] "
-        "SR860_x[V] SR860_y[V] SR860_f[Hz] "
-        "SR860_sin[V] SR860_theta[deg] "
-        "SR860_phase[deg] SR860_mag[V] "
+        "SR860x[V] SR860y[V] SR860f[Hz] "
+        "SR860sin[V] SR860theta[deg] "
+        "SR860phase[deg] SR860mag[V] "
         "HTR CNT DateTime"
     )
 
@@ -121,7 +121,7 @@ class PressureMeasurement:
 
         :returns: 'YYYY-MM-DD HH:MM:SS.microseconds'
         """
-        return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        return datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S.%f")
 
     def _get_measurement_record(self, count: int) -> str:
         """
@@ -181,18 +181,17 @@ class PressureMeasurement:
         self.lakeshore.write(f"RAMP 1,1,{ramp_rate}")
         self.lakeshore.write(f"SETP 1,{target_temp}")
         self.logger.info(f"Ramping to {target_temp}K @ {ramp_rate}K/min")
-        process = subprocess.Popen(f"py ../Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V]")
+        process = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V]")
         while True:
             ctrl = float(self.lakeshore.ask("KRDG? B"))
-            samp = float(self.lakeshore.ask("KRDG? A"))
-            if abs(ctrl - target_temp) <= control_tol and abs(samp - target_temp) <= sample_tol:
+            if abs(ctrl - target_temp) <= control_tol :
                 self.logger.info(f"Reached {target_temp}K within tolerance.")
                 break
 
             record = self._get_measurement_record(count)
             with open(out_file, "a") as f:
                 f.write(record + "\n")
-            self.logger.debug(f"Logged #{count}")
+            self.logger.debug(record)
             count += 1
             time.sleep(interval)
         process.terminate()
@@ -232,7 +231,7 @@ class PressureMeasurement:
                 max_cycles=None,
         ) as stabilizer:
             # Loop over each temperature in the sweep, numbering from 1
-            process = subprocess.Popen(f"py ../Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V]")
+            process = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V]")
             for idx, temp in enumerate(sweep, 1):
                 # Log the current stabilization step
                 self.logger.info(f"Stabilizing at {temp}K (step {idx}/{len(sweep)})")

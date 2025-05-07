@@ -146,7 +146,7 @@ class TemperatureStabilizer:
         """
         json_dir = os.path.dirname(self.json_filepath)
         with tempfile.NamedTemporaryFile(
-            mode='w', dir=json_dir or '.', delete=False
+                mode='w', dir=json_dir or '.', delete=False
         ) as tmp:
             json.dump(data, tmp, indent=4)
             temp_name = tmp.name
@@ -238,36 +238,43 @@ class TemperatureStabilizer:
                 self.logger.error(f"Exceeded maximum cycles: {self.max_cycles}")
                 return False
 
-            # collect measurements for this cycle
-            self.current_measurements = []
+            # Initialize a new cycle record and append it to history
+            cycle = {
+                "measurements": [],
+                "slope_A": None,
+                "intercept_B": None,
+            }
+
+            self.cycles_history.append(cycle)
+            self._update_json()  # Persist the newly created empty cycle
+
+            # Point the current_measurements list to the cycle's measurements
+            self.current_measurements = cycle["measurements"]
+
+            # Collect nb_points measurements, updating JSON after each
             for _ in range(self.nb_points):
                 try:
-                    temp = self._measure_temperature()
-                    self.current_measurements.append(temp)
-                    # atomic write after each new point
-                    self._update_json()
+                    temperature = self._measure_temperature()
+                    self.current_measurements.append(temperature)
+                    self._update_json()  # Persist the added measurement
                     time.sleep(self.sampling_time)
                 except visa_errors.VisaIOError as e:
                     self.logger.error(f"Communication error during measurement: {e}")
                     return False
 
-
-            # perform regression
+            # Execute linear regression on the collected data
             A, B = self._perform_regression()
 
-            # record cycle data
-            cycle = {
-                "measurements": self.current_measurements.copy(),
-                "slope_A": A,
-                "intercept_B": B,
-            }
-            self.cycles_history.append(cycle)
-            self._update_json()
+            # Store regression results in the cycle record
+            cycle["slope_A"] = A
+            cycle["intercept_B"] = B
+            self._update_json()  # Persist slope and intercept
 
-            # stabilization check: slope ≈ 0 and intercept within tolerance_B
+            # Evaluate stabilization criteria
             if abs(A) <= self.tolerance_A and abs(B - self.setpoint) <= self.tolerance_B:
                 self.logger.info("Stabilization criteria met.")
                 return True
 
-            self.logger.warning(f"Cycle {cycle_count} not stable (A={A:.6f} K/s, B={B:.6f} K); retrying...")
+            self.logger.warning(f"Cycle {cycle_count} did not stabilize (slope={A:.6f} K/s, intercept={B:.6f} K); retrying...")
             time.sleep(self.sampling_time)
+
