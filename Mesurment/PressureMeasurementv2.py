@@ -162,9 +162,9 @@ class PressureMeasurement:
 
         fields = [
             f"{tA:.6f}", f"{tB:.6f}", f"{setpt:.6f}",
-            f"{x:.6f}", f"{y:.6f}", f"{freq:.2f}",
-            f"{sin_v:.6f}", f"{theta:.2f}", f"{phase:.2f}",
-            f"{mag:.6f}", heater_out,
+            f"{x:.12f}", f"{y:.12f}", f"{freq:.2f}",
+            f"{sin_v:.6f}", f"{theta:.6f}", f"{phase:.6f}",
+            f"{mag:.12f}", heater_out,
             str(count), self._current_timestamp()
         ]
         return " ".join(fields)
