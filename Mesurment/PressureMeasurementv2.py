@@ -231,7 +231,7 @@ class PressureMeasurement:
                 max_cycles=None,
         ) as stabilizer:
             # Loop over each temperature in the sweep, numbering from 1
-            LivePlot = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V]")
+            LivePlot = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V] T_A[K],SR860y[V]")
             JsonPlot = subprocess.Popen(f"py ./Ploting/JsonPlotter.py {cfg_path}")
             for idx, temp in enumerate(sweep, 1):
                 # Log the current stabilization step
