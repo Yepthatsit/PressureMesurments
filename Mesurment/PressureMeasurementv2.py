@@ -231,7 +231,8 @@ class PressureMeasurement:
                 max_cycles=None,
         ) as stabilizer:
             # Loop over each temperature in the sweep, numbering from 1
-            process = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V]")
+            LivePlot = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V]")
+            JsonPlot = subprocess.Popen(f"py ./Ploting/JsonPlotter.py {cfg_path}")
             for idx, temp in enumerate(sweep, 1):
                 # Log the current stabilization step
                 self.logger.info(f"Stabilizing at {temp}K (step {idx}/{len(sweep)})")
@@ -249,5 +250,6 @@ class PressureMeasurement:
                     f.write(record + "\n")
                 # Log that the record was successfully written
                 self.logger.debug(f"Recorded at {temp}K")
-            process.terminate()
+            LivePlot.terminate()
+            JsonPlot.terminate()
 

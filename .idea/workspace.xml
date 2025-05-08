@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="ploting working" />
+    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="whatever">
+      <change beforePath="$PROJECT_DIR$/.idea/PressureMesurments.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PressureMesurments.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mesurment/openPlotTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mesurment/openPlotTest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ploting/JsonPlotter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Ploting/JsonPlotter.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -52,21 +58,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.JsonPlotter.executor": "Run",
-    "Python.Stabilisation_atomic_json.executor": "Run",
-    "Python.Stabilisation_atomic_jsonv2.executor": "Debug",
-    "Python.main.executor": "Run",
-    "Python.openPlotTest.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "D:/OneDrive/_SupMagMat_Uniaxial_Pressure/Software_py/PressureMesurments-master/Stabilization",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.JsonPlotter.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Stabilisation_atomic_json.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Stabilisation_atomic_jsonv2.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.openPlotTest.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/OneDrive/_SupMagMat_Uniaxial_Pressure/Software_py/PressureMesurments-master/Stabilization&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\OneDrive\_SupMagMat_Uniaxial_Pressure\Software_py\PressureMesurments-master\Stabilization" />
@@ -76,7 +82,7 @@
       <recent name="C:\Users\karol\Desktop\Praca AGH\PressureMesurments\Stabilization" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python.openPlotTest">
     <configuration name="JsonPlotter" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="PressureMesurments" />
       <option name="ENV_FILES" value="" />
@@ -108,7 +114,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.12 (PROBE)" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -155,7 +160,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-babbdf50b680-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.15989.155" />
+        <option value="bundled-python-sdk-14705d77f0bb-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.25659.43" />
       </set>
     </attachedChunks>
   </component>
@@ -232,7 +237,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746537681561</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="whatever">
+      <option name="closed" value="true" />
+      <created>1746624513160</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1746624513160</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -253,6 +266,7 @@
     <MESSAGE value="Mesurment ready?" />
     <MESSAGE value="Lab changes" />
     <MESSAGE value="ploting working" />
-    <option name="LAST_COMMIT_MESSAGE" value="ploting working" />
+    <MESSAGE value="whatever" />
+    <option name="LAST_COMMIT_MESSAGE" value="whatever" />
   </component>
 </project>
