@@ -136,11 +136,11 @@ class PressureMeasurement:
         tA = float(self.lakeshore.ask("KRDG? A"))
         tB = float(self.lakeshore.ask("KRDG? B"))
         setpt = float(self.lakeshore.ask("SETP? 1"))
-        xarr = np.array([])
-        yarr = np.array([])
-        thetarr = np.array([])
-        phasearr = np.array([])
-        magarr = np.array([])
+        xarr = []
+        yarr = []
+        thetarr = []
+        phasearr = []
+        magarr = []
         for i in range(self.LockinAvrage):
             xarr.append(self.lockin.x)
             yarr.append(self.lockin.y)
@@ -149,13 +149,13 @@ class PressureMeasurement:
             magarr.append(self.lockin.magnitude)
             time.sleep(0.1)
         # Lock-in readings
-        x     = xarr.mean()
-        y     = yarr.mean()
+        x     = np.mean(xarr)
+        y     = np.mean(yarr)
         freq  = self.lockin.frequency
         sin_v = self.lockin.sine_voltage
-        theta = thetarr.mean()
-        phase = phasearr.mean()
-        mag   = magarr.mean()
+        theta = np.mean(thetarr)
+        phase = np.mean(phasearr)
+        mag   = np.mean(magarr)
 
         # Heater output
         heater_out = self.lakeshore.ask("HTR?")
