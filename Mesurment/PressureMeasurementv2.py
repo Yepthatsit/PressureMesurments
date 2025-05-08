@@ -47,7 +47,9 @@ class PressureMeasurement:
         """
 
         self.config = config
-
+        self.LockinAvrage = 10
+        if("LockinAvrage" in config.keys()):
+            self.LockinAvrage = config["LockinAvrage"]
         # Configure per-class logger
         self.logger = configure_class_logger(self.__class__.__name__)
 
@@ -136,13 +138,13 @@ class PressureMeasurement:
         setpt = float(self.lakeshore.ask("SETP? 1"))
 
         # Lock-in readings
-        x     = self.lockin.x
-        y     = self.lockin.y
+        x     = np.mean([self.lockin.x for i in range(self.LockinAvrage)])
+        y     = np.mean([self.lockin.y for i in range(self.LockinAvrage)])
         freq  = self.lockin.frequency
         sin_v = self.lockin.sine_voltage
-        theta = self.lockin.theta
-        phase = self.lockin.phase
-        mag   = self.lockin.magnitude
+        theta = np.mean([self.lockin.theta for i in range(self.LockinAvrage)])
+        phase = np.mean([self.lockin.phase for i in range(self.LockinAvrage)])
+        mag   = np.mean([self.lockin.magnitude for i in range(self.LockinAvrage)])
 
         # Heater output
         heater_out = self.lakeshore.ask("HTR?")
