@@ -183,7 +183,7 @@ class PressureMeasurement:
         self.lakeshore.write(f"RAMP 1,1,{ramp_rate}")
         self.lakeshore.write(f"SETP 1,{target_temp}")
         self.logger.info(f"Ramping to {target_temp}K @ {ramp_rate}K/min")
-        process = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V]")
+        process = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V] CNT,T_A[K] T_A[K],SR860y[V]")
         while True:
             ctrl = float(self.lakeshore.ask("KRDG? B"))
             if abs(ctrl - target_temp) <= control_tol :
@@ -233,7 +233,7 @@ class PressureMeasurement:
                 max_cycles=None,
         ) as stabilizer:
             # Loop over each temperature in the sweep, numbering from 1
-            LivePlot = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V] T_A[K],SR860y[V]")
+            LivePlot = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V] CNT,T_A[K] T_A[K],SR860y[V]")
             JsonPlot = subprocess.Popen(f"py ./Ploting/JsonPlotter.py {cfg_path}")
             for idx, temp in enumerate(sweep, 1):
                 # Log the current stabilization step

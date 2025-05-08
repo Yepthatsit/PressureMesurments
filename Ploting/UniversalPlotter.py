@@ -14,7 +14,7 @@ class UniversalPlotter:
     axes:list = []
     lines:list = []
     sep = ""
-    def __init__(self,file:str,plots:list,coll_num:int = 1,separator:str = ' ',markersize = 0.1) -> None:
+    def __init__(self,file:str,plots:list,coll_num:int = 2,separator:str = ' ',markersize = 0.1) -> None:
         """_summary_
         initialazes class with all necessery data. To start plot use startPlot method.
         Args:
