@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="second Plot">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mesurment/PressureMeasurementv2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mesurment/PressureMeasurementv2.py" afterDir="false" />
-    </list>
+    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="Plot changes" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -258,7 +255,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746694851033</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Avreadging done">
+      <option name="closed" value="true" />
+      <created>1746697626587</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1746697626587</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Plot changes">
+      <option name="closed" value="true" />
+      <created>1746697838653</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1746697838653</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -282,6 +295,8 @@
     <MESSAGE value="whatever" />
     <MESSAGE value="Jsnon Plotter" />
     <MESSAGE value="second Plot" />
-    <option name="LAST_COMMIT_MESSAGE" value="second Plot" />
+    <MESSAGE value="Avreadging done" />
+    <MESSAGE value="Plot changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Plot changes" />
   </component>
 </project>
