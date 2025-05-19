@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="Plot changes" />
+    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="ploting working" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -52,21 +52,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.JsonPlotter.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Stabilisation_atomic_json.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Stabilisation_atomic_jsonv2.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.openPlotTest.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/OneDrive/_SupMagMat_Uniaxial_Pressure/Software_py/PressureMesurments-master/Stabilization&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.JsonPlotter.executor": "Run",
+    "Python.Stabilisation_atomic_json.executor": "Run",
+    "Python.Stabilisation_atomic_jsonv2.executor": "Debug",
+    "Python.main.executor": "Run",
+    "Python.openPlotTest.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/OneDrive/_SupMagMat_Uniaxial_Pressure/Software_py/PressureMesurments-master/Stabilization",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\OneDrive\_SupMagMat_Uniaxial_Pressure\Software_py\PressureMesurments-master\Stabilization" />
@@ -76,7 +76,7 @@
       <recent name="C:\Users\karol\Desktop\Praca AGH\PressureMesurments\Stabilization" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.openPlotTest">
+  <component name="RunManager" selected="Python.main">
     <configuration name="JsonPlotter" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="PressureMesurments" />
       <option name="ENV_FILES" value="" />
@@ -108,6 +108,7 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12 (PROBE)" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -154,7 +155,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-14705d77f0bb-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.25659.43" />
+        <option value="bundled-python-sdk-babbdf50b680-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.15989.155" />
       </set>
     </attachedChunks>
   </component>
@@ -231,55 +232,7 @@
       <option name="project" value="LOCAL" />
       <updated>1746537681561</updated>
     </task>
-    <task id="LOCAL-00009" summary="whatever">
-      <option name="closed" value="true" />
-      <created>1746624513160</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1746624513160</updated>
-    </task>
-    <task id="LOCAL-00010" summary="Jsnon Plotter">
-      <option name="closed" value="true" />
-      <created>1746693274331</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1746693274331</updated>
-    </task>
-    <task id="LOCAL-00011" summary="second Plot">
-      <option name="closed" value="true" />
-      <created>1746694851033</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1746694851033</updated>
-    </task>
-    <task id="LOCAL-00012" summary="Avreadging done">
-      <option name="closed" value="true" />
-      <created>1746697626587</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1746697626587</updated>
-    </task>
-    <task id="LOCAL-00013" summary="Plot changes">
-      <option name="closed" value="true" />
-      <created>1746697838653</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1746697838653</updated>
-    </task>
-    <task id="LOCAL-00014" summary="Plot changes">
-      <option name="closed" value="true" />
-      <created>1746713179884</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1746713179884</updated>
-    </task>
-    <option name="localTasksCounter" value="15" />
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -300,11 +253,6 @@
     <MESSAGE value="Mesurment ready?" />
     <MESSAGE value="Lab changes" />
     <MESSAGE value="ploting working" />
-    <MESSAGE value="whatever" />
-    <MESSAGE value="Jsnon Plotter" />
-    <MESSAGE value="second Plot" />
-    <MESSAGE value="Avreadging done" />
-    <MESSAGE value="Plot changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Plot changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="ploting working" />
   </component>
 </project>

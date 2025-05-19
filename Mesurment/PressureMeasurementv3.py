@@ -1,10 +1,12 @@
 import os
+import sys
+
 from Stabilization.Stabilisation_atomic_jsonv3 import MeasurementConfig,configure_class_logger,TemperatureStabilizer
 import datetime
 import time
 import numpy as np
-import subprocess
 import pandas as pd
+import subprocess
 from typing import Optional
 from typing_extensions import Required
 
@@ -49,8 +51,7 @@ class PressureMeasurement:
 
         self.config = config
         self.LockinAvrage = 10
-        if("LockinAvrage" in config.keys()):
-            self.LockinAvrage = config["LockinAvrage"]
+
         # Configure per-class logger
         self.logger = configure_class_logger(self.__class__.__name__)
 
@@ -199,7 +200,20 @@ class PressureMeasurement:
         self.lakeshore.write(f"RAMP 1,1,{ramp_rate}")
         self.lakeshore.write(f"SETP 1,{target_temp}")
         self.logger.info(f"Ramping to {target_temp}K @ {ramp_rate}K/min")
-        process = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V] CNT,T_A[K] T_A[K],SR860y[V] CNT,dTdt")
+        process = subprocess.Popen([
+        sys.executable, "./Ploting/UniversalPlotterPlotly.py",
+        "-f", out_file,  # data file
+        "-p",
+            "T_A[K],SR860x[V]",  # plot T_A vs SR860x
+            "T_A[K],SR860y[V]",  # plot T_A vs SR860y
+            "CNT,T_A[K]",  # plot CNT vs T_A
+            "CNT,dTdt", # plot CNT vs dTdt
+        "-c", "2",            # number of columns in the grid (now 3 plots)
+        "-s", " ",            # separator in the file
+        "-i", str(int(interval*1000)),  # refresh interval (ms)
+        "--host", "0.0.0.0",  # Dash server host address
+        "--port", "8050",     # Dash server port
+        ])
         while True:
             ctrl = float(self.lakeshore.ask("KRDG? B"))
             if abs(ctrl - target_temp) <= control_tol :
@@ -249,8 +263,19 @@ class PressureMeasurement:
                 max_cycles=None,
         ) as stabilizer:
             # Loop over each temperature in the sweep, numbering from 1
-            LivePlot = subprocess.Popen(f"py ./Ploting/UniversalPlotter.py {out_file} T_A[K],SR860x[V] CNT,T_A[K] T_A[K],SR860y[V]")
-            JsonPlot = subprocess.Popen(f"py ./Ploting/JsonPlotter.py {cfg_path}")
+            process = subprocess.Popen([
+                sys.executable, "./Ploting/UniversalPlotterPlotly.py",
+                "-f", out_file,  # data file
+                "-p",
+                "T_A[K],SR860x[V]",  # plot T_A vs SR860x
+                "T_A[K],SR860y[V]",  # plot T_A vs SR860y
+                "CNT,T_A[K]",  # plot CNT vs T_A
+                "-c", "2",  # number of columns in the grid (now 3 plots)
+                "-s", " ",  # separator in the file
+                "-i", str(int(self.sampling_interval*1000)),  # refresh interval (ms)
+                "--host", "0.0.0.0",  # Dash server host address
+                "--port", "8050",  # Dash server port
+            ])
             for idx, temp in enumerate(sweep, 1):
                 # Log the current stabilization step
                 self.logger.info(f"Stabilizing at {temp}K (step {idx}/{len(sweep)})")
@@ -262,12 +287,11 @@ class PressureMeasurement:
                     self.logger.error(f"Stabilization failed at {temp}K. Aborting.")
                     break
                 # Once stable, collect a measurement record
-                record = self._get_measurement_record(idx,out_file,np.nan)
+                record = self._get_measurement_record(idx)
                 # Append the record to the output file
                 with open(out_file, "a") as f:
                     f.write(record + "\n")
                 # Log that the record was successfully written
                 self.logger.debug(f"Recorded at {temp}K")
-            LivePlot.terminate()
-            JsonPlot.terminate()
+            process.terminate()
 
