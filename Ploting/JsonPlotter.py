@@ -24,17 +24,28 @@ class JsonPlotter:
         self.FitedLine, = self.Plot.plot([],[],label='Fitted line')
         self.Plot.legend()
     def __HandlePlots(self,i):
-        file = open(self.FileName,'r')
-        jsondata = json.load(file)
-        file.close()
+        success = True
+        jsondata = 0
+        while success :
+            try:
+                file = open(self.FileName,'r')
+                jsondata = json.load(file)
+                success = False
+                file.close()
+            except:
+                pass
         lastMeasurment = jsondata["cycles_history"][-1]
         tolerancepoints = [jsondata['setpoint'],jsondata['setpoint'] + jsondata['tolerance_B'],jsondata['setpoint'] - jsondata['tolerance_B']]
+        self.Points.set_data([], [])
         pts: list = lastMeasurment['measurements']
         x = np.arange(len(pts))
         for line,tolerancepoint in zip(self.ToleranceLines,tolerancepoints ):
             line.set_data(x,[tolerancepoint])
         self.Points.set_data(x,pts)
-        self.FitedLine.set_data(x,lastMeasurment['slope_A']*x + lastMeasurment['intercept_B'])
+        if(lastMeasurment['slope_A'] != None and  lastMeasurment['intercept_B'] != None):
+            self.FitedLine.set_data(x,lastMeasurment['slope_A']*x + lastMeasurment['intercept_B'])
+        else:
+            self.FitedLine.set_data([], [])
         self.Plot.relim()
         self.Plot.autoscale_view()
         self.Figure.tight_layout()

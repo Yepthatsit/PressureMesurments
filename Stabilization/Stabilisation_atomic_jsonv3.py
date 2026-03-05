@@ -140,17 +140,31 @@ class TemperatureStabilizer:
 
     def _write_json_atomic(self, data: Dict[str, Any]) -> None:
         """
-        Atomically write JSON data to the configured filepath.
-
-        :param data: Dictionary payload to write.
+        Atomically write JSON data to self.json_filepath.
+        Guarantees that the temp file is removed even if an error occurs.
         """
-        json_dir = os.path.dirname(self.json_filepath)
-        with tempfile.NamedTemporaryFile(
-                mode='w', dir=json_dir or '.', delete=False
-        ) as tmp:
-            json.dump(data, tmp, indent=4)
-            temp_name = tmp.name
-        os.replace(temp_name, self.json_filepath)
+        # Determine directory (fall back to current dir if none)
+        json_dir = os.path.dirname(self.json_filepath) or '.'
+
+        # Create a named temp file and get its low-level fd and path
+        fd, tmp_path = tempfile.mkstemp(dir=json_dir, prefix='.__tmp_')
+        try:
+            # Open the fd as a proper file object and write out the JSON
+            with os.fdopen(fd, 'w') as tmp_file:
+                json.dump(data, tmp_file, indent=4)
+                tmp_file.flush()
+                os.fsync(tmp_file.fileno())
+
+            # Atomically replace the old file with the new one
+            os.replace(tmp_path, self.json_filepath)
+
+        finally:
+            # If anything went wrong before os.replace, ensure we clean up
+            if os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
 
     def _measure_temperature(self) -> float:
         """

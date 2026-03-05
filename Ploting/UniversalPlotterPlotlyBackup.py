@@ -1,15 +1,12 @@
 import difflib
 import io
-import logging
 import socket
 import uuid
-import json
 import pandas as pd
 import plotly.express as px
 import requests
-import time
 
-from typing import Optional
+
 from itertools import cycle
 from dash import Dash, dcc, html, Input, Output, State
 from flask import send_file, request, url_for
@@ -46,7 +43,7 @@ class LivePlotlyApp:
     Dash application for live plotting CSV data.
     Supports predefined plots, dynamic custom plots, and status cards.
     """
-    def __init__(self, file_path, predefined_plots, cols, sep, refresh_ms,stabilization_json: Optional[str] = None):
+    def __init__(self, file_path, predefined_plots, cols, sep, refresh_ms):
         """
         Initialize the live plotter application.
 
@@ -57,7 +54,6 @@ class LivePlotlyApp:
         :param refresh_ms: Refresh interval in milliseconds.
         """
         self.file_path = file_path
-        self.stabilization_json = stabilization_json
         # Split each 'x,y' string into [x, y] lists
         self.predefined_plots = [p.split(',') for p in predefined_plots]
         self.cols = cols
@@ -74,14 +70,6 @@ class LivePlotlyApp:
         :param port: Port number for the server.
         :param debug: Enable Dash debug mode if True.
         """
-
-        logging.getLogger('werkzeug').disabled = True
-        logging.getLogger('flask').disabled = True
-        logging.getLogger('dash').disabled = True
-        logging.getLogger('dash.dash').disabled = True
-        logging.getLogger('dash._callback_context').disabled = True
-        logging.disable(logging.CRITICAL)
-
         app = Dash(__name__)
         server = app.server
 
@@ -135,15 +123,6 @@ class LivePlotlyApp:
             id='custom-graphs-container',
             style={'display': 'grid', 'gridTemplateColumns': 'repeat(2, 1fr)', 'gap': '20px'}
         )
-
-        # Optional stabilization plot for JSON data
-        if self.stabilization_json:
-            json_graph = html.Div(
-                dcc.Graph(id='stabilization-plot', config={'scrollZoom': True}),
-                style={'margin': '20px 0'}
-            )
-        else:
-            json_graph = html.Div()
 
         # Control panel for adding custom scatter plots at runtime
         controls = html.Div([
@@ -244,7 +223,7 @@ class LivePlotlyApp:
             body_raw = msg.get("body", "")
 
             # 2) Normalize
-            norm = body_raw.strip().lower()
+            norm = " ".join(body_raw.lower().split())
             print(f"[ULTRAMSG] from={sender!r}, norm={norm!r}")
 
             # 3) Try fuzzy match against FIELD_NAMES
@@ -268,7 +247,7 @@ class LivePlotlyApp:
                 cmd = snap_match[0].split()
                 idx = int(cmd[1]) if len(cmd) > 1 else 0
                 if 0 <= idx <= max_idx:
-                    image_url = url_for("snapshot", idx=idx, _external=True) + f'?time={time.time()}'
+                    image_url = url_for("snapshot", idx=idx, _external=True)
                     send_ultramsg_image(
                         to=sender,
                         image_url=image_url,
@@ -293,21 +272,22 @@ class LivePlotlyApp:
             return "OK", 200
 
         # Assemble the full application layout
-        layout_children = [store, card_selector, status_container, predefined_graphs]
-        if self.stabilization_json:
-            layout_children.append(json_graph)
-        layout_children.extend([custom_container, controls,
-                                dcc.Interval(id='interval-component', interval=self.refresh_ms, n_intervals=0)])
-
-        app.layout = html.Div(layout_children, style={'width': '90%', 'margin': 'auto', 'fontFamily': 'Arial'})
-
+        app.layout = html.Div([
+            store,
+            card_selector,
+            status_container,
+            predefined_graphs,
+            custom_container,
+            controls,
+            dcc.Interval(id='interval-component', interval=self.refresh_ms, n_intervals=0)
+        ], style={'width': '90%', 'margin': 'auto', 'fontFamily': 'Arial'})
 
         @app.callback(
-                Output('custom-plots', 'data'),
-                Input('add-graph-button', 'n_clicks'),
-                State('x-axis-dropdown', 'value'),
-                State('y-axis-dropdown', 'value'),
-                State('custom-plots', 'data')
+            Output('custom-plots', 'data'),
+            Input('add-graph-button', 'n_clicks'),
+            State('x-axis-dropdown', 'value'),
+            State('y-axis-dropdown', 'value'),
+            State('custom-plots', 'data')
         )
         def add_plot(n_clicks, x_axis, y_axis, data):
             """
@@ -317,20 +297,9 @@ class LivePlotlyApp:
                 data.append({'x': x_axis, 'y': y_axis})
             return data
 
-        # Prepare outputs list
-        if self.stabilization_json:
-            outputs = [
-                Output("stabilization-plot", "figure"),
-                *[Output(f"plot-{i}", "figure") for i in range(len(self.predefined_plots))],
-                Output("status-box", "children"),
-                Output("custom-graphs-container", "children"),
-            ]
-        else:
-            outputs = [
-                *[Output(f"plot-{i}", "figure") for i in range(len(self.predefined_plots))],
-                Output("status-box", "children"),
-                Output("custom-graphs-container", "children"),
-            ]
+        # Prepare outputs for predefined figures, status cards, and custom graphs
+        outputs = [Output(f'plot-{i}', 'figure') for i in range(len(self.predefined_plots))]
+        outputs.extend([Output('status-box', 'children'), Output('custom-graphs-container', 'children')])
 
         @app.callback(
             outputs,
@@ -347,6 +316,8 @@ class LivePlotlyApp:
             :param custom_data: List of custom plot definitions
             :param selected_cards: Fields selected for status display
             """
+            # Read the latest data from CSV
+            df = pd.read_csv(self.file_path, sep=self.sep)
 
             #Style
             palette = px.colors.qualitative.Vivid
@@ -355,48 +326,6 @@ class LivePlotlyApp:
 
             # Generate figures for each predefined plot
             figs = []
-
-            # Stabilization JSON plot
-            if self.stabilization_json:
-                try:
-                    with open(self.stabilization_json, 'r') as f:
-                        data_json = json.load(f)
-                    last = data_json['cycles_history'][-1]
-                    measurements = last['measurements']
-                    x_vals = list(range(len(measurements)))
-                    # Use Plotly Express for scatter
-                    fig_json = px.scatter(x=x_vals, y=measurements,
-                                          labels={'x': 'Measurement Index', 'y': 'Temperature'},
-                                          title='Stabilization: Temperature vs CNT',template=template,color_discrete_sequence=['darkblue'])
-                    fig_json.update_traces(marker=dict(size=10))
-                    # Add lines for setpoint and tolerance
-                    sp, tol = data_json['setpoint'], data_json['tolerance_B']
-                    fig_json.add_hline(y=sp, line_dash='solid', annotation={'text': 'Setpoint','font': {'color': 'darkgreen', 'size': 14, 'family': 'Arial Black'},'bgcolor': 'rgba(0,0,0,0)',
-                                                                            'showarrow': False
-                                                                            },line_width=3,line_color='darkgreen')
-                    fig_json.add_hline(y=sp + tol, line_dash='dash', annotation={'text': '+Tolerance','font': {'color': 'darkred', 'size': 14, 'family': 'Arial Black'},'bgcolor': 'rgba(0,0,0,0)',
-                                                                            'showarrow': False
-                                                                            },line_width=3, line_color='darkred')
-                    fig_json.add_hline(y=sp - tol, line_dash='dash', annotation={'text': '-Tolerance','font': {'color': 'darkred', 'size': 14, 'family': 'Arial Black'},'bgcolor': 'rgba(0,0,0,0)',
-                                                                            'showarrow': False
-                                                                            }, line_width=3, line_color='darkred')
-                    # Fitted line if available
-                    if last.get('slope_A') is not None and last.get('intercept_B') is not None:
-                        fitted = [last['slope_A'] * xi + last['intercept_B'] for xi in x_vals]
-                        fig_fit = px.line(x=x_vals, y=fitted, labels={'x': 'Measurement Index', 'y': 'Fit'},
-                                          title='Fit Line',template=template,color_discrete_sequence=['darkorange'],)
-                        # Combine traces
-                        for trace in fig_fit.data:
-                            fig_json.add_trace(trace)
-                    figs.append(fig_json)
-                except Exception as e:
-                    err_fig = px.scatter(x=[0], y=[0], title=f'JSON read error: {e}')
-                    figs.append(err_fig)
-
-
-            # Read the latest data from CSV
-            df = pd.read_csv(self.file_path, sep=self.sep)
-
             for x_col, y_col in self.predefined_plots:
                 color = next(color_cycle)
                 fig = px.line(df, x=x_col, y=y_col, title=f"{y_col} vs {x_col}", labels={x_col: x_col, y_col: y_col},
@@ -424,7 +353,6 @@ class LivePlotlyApp:
             # Return all updated components: predefined figures, status cards, and custom graphs
             return [*figs, cards, custom_children]
 
-
         # Display server URLs to console
         display_ip = get_local_ip() if host == '0.0.0.0' else host
         print("Dash app is running!")
@@ -433,7 +361,7 @@ class LivePlotlyApp:
         print(f"• Secret Key: {secret_key}")
 
         # Launch the Dash server
-        app.run(host=host, port=port, debug=False, dev_tools_silence_routes_logging=True,threaded=True,dev_tools_ui=False,dev_tools_props_check=False,dev_tools_hot_reload=False)
+        app.run(host=host, port=port, debug=False, dev_tools_silence_routes_logging=True,threaded=True)
 
 if __name__ == "__main__":
     import argparse
@@ -448,7 +376,6 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--interval", type=int, default=1000, help="Refresh interval in milliseconds")
     parser.add_argument("--host", default="0.0.0.0", help="Server host")
     parser.add_argument("--port", type=int, default=8050, help="Server port")
-    parser.add_argument("--json", dest="stabilization_json", default=None, help="Optional path to JSON file for stabilization plot")
     parser.add_argument("--debug", action="store_true", help="Enable Dash debug mode")
     args = parser.parse_args()
 
@@ -458,7 +385,6 @@ if __name__ == "__main__":
         predefined_plots=args.plot,
         cols=args.cols,
         sep=args.sep,
-        refresh_ms=args.interval,
-        stabilization_json=args.stabilization_json
+        refresh_ms=args.interval
     )
     app.run(host=args.host, port=args.port, debug=args.debug)

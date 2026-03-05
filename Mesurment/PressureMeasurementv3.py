@@ -1,17 +1,18 @@
 import os
 import sys
-
-from Stabilization.Stabilisation_atomic_jsonv3 import MeasurementConfig,configure_class_logger,TemperatureStabilizer
 import datetime
+import requests
 import time
 import numpy as np
 import pandas as pd
 import subprocess
-from typing import Optional
-from typing_extensions import Required
 
+from Stabilization.Stabilisation_atomic_jsonv3 import MeasurementConfig,configure_class_logger,TemperatureStabilizer
+from typing import Optional, List
+from typing_extensions import Required
 from pymeasure.instruments.lakeshore import LakeShore331
 from pymeasure.instruments.srs import SR860
+
 
 
 # Base directory for resolving relative file paths in this module
@@ -29,7 +30,7 @@ class PressureMeasurement:
         "SR860x[V] SR860y[V] SR860f[Hz] "
         "SR860sin[V] SR860theta[deg] "
         "SR860phase[deg] SR860mag[V] "
-        "HTR dTdt CNT DateTime"
+        "HTR dTdt[K/min] CNT DateTime"
     )
 
     def __init__(self, config: MeasurementConfig) -> None:
@@ -48,6 +49,19 @@ class PressureMeasurement:
             - sampling_interval: float
                 Delay in seconds between successive temperature readings.
         """
+
+        self.ULTRAMSG_INSTANCE_ID = "instance121596"
+        self.ULTRAMSG_TOKEN = "0b81z4fm8m3w6a4s"
+
+        # List of WhatsApp recipients
+        self.WHATSAPP_RECIPIENTS = [
+            "+33749971273",
+            "+33621900337",
+            "+48797196749",
+        ]
+
+        # Base URL for snapshot endpoints (e.g., ngrok URL)
+        self.SNAPSHOT_BASE_URL = "https://glowing-snapper-crisp.ngrok-free.app"
 
         self.config = config
         self.LockinAvrage = 10
@@ -152,13 +166,13 @@ class PressureMeasurement:
             magarr.append(self.lockin.magnitude)
             time.sleep(0.1)
         # Lock-in readings
-        x     = np.mean(xarr)
-        y     = np.mean(yarr)
-        freq  = self.lockin.frequency
+        x = np.mean(xarr)
+        y = np.mean(yarr)
+        freq = self.lockin.frequency
         sin_v = self.lockin.sine_voltage
         theta = np.mean(thetarr)
         phase = np.mean(phasearr)
-        mag   = np.mean(magarr)
+        mag = np.mean(magarr)
 
         # Heater output
         heater_out = self.lakeshore.ask("HTR?")
@@ -175,13 +189,49 @@ class PressureMeasurement:
         ]
         return " ".join(fields)
 
+
+    def _send(self, to: str, body: Optional[str] = None, media_url: Optional[str] = None):
+        try:
+            if media_url:
+                url = f"https://api.ultramsg.com/{self.ULTRAMSG_INSTANCE_ID}/messages/image"
+                data = {
+                    "token": self.ULTRAMSG_TOKEN,
+                    "to": to,
+                    "image": media_url,
+                    "caption": body or ""
+                }
+            else:
+                url = f"https://api.ultramsg.com/{self.ULTRAMSG_INSTANCE_ID}/messages/chat"
+                data = {
+                    "token": self.ULTRAMSG_TOKEN,
+                    "to": to,
+                    "body": body
+                }
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            response = requests.post(url, headers=headers, data=data)
+            self.logger.info(f"Message sent to {to}: {response.status_code} {response.text}")
+        except Exception as e:
+            self.logger.error(f"Failed to send message to {to}: {e}")
+
+
+    def send_whatsapp_text(self, body: str, recipients: Optional[List[str]] = None):
+        targets = recipients or self.WHATSAPP_RECIPIENTS
+        for to in targets:
+            self._send(to=to, body=body)
+
+    def send_whatsapp_media(self, media_urls: List[str], recipients: Optional[List[str]] = None):
+        targets = recipients or self.WHATSAPP_RECIPIENTS
+        for to in targets:
+            for media_url in media_urls:
+                self._send(to=to, media_url=media_url)
+
     def go_to_temperature(
         self,
         file_path: str,
         target_temp: float,
         ramp_rate: float = 4.0,
-        sample_tol: float = 0.5,
-        control_tol: float = 0.5,
+        sample_tol: float = 0.05,
+        control_tol: float = 0.05,
         interval: float = 5.0,
     ) -> None:
         """
@@ -195,11 +245,25 @@ class PressureMeasurement:
         :param interval: Time between log cycles (s).
         """
         out_file = self._ensure_file(file_path)
-        count = 1
+
+        if os.path.exists(out_file):
+            try:
+                df = pd.read_csv(out_file, delim_whitespace=True, header=0)
+                if 'CNT' in df.columns and not df.empty:
+                    last_cnt = int(df['CNT'].iloc[-1])
+                    count = last_cnt + 1
+                else:
+                    count = 1
+            except Exception:
+                count = 1
+        else:
+            count = 1
 
         self.lakeshore.write(f"RAMP 1,1,{ramp_rate}")
         self.lakeshore.write(f"SETP 1,{target_temp}")
         self.logger.info(f"Ramping to {target_temp}K @ {ramp_rate}K/min")
+        self.send_whatsapp_text(f"📈 Ramping in progress → Target: {target_temp} K\n" f"Ramp rate: {ramp_rate} K/min")
+
         process = subprocess.Popen([
         sys.executable, "./Ploting/UniversalPlotterPlotly.py",
         "-f", out_file,  # data file
@@ -207,8 +271,8 @@ class PressureMeasurement:
             "T_A[K],SR860x[V]",  # plot T_A vs SR860x
             "T_A[K],SR860y[V]",  # plot T_A vs SR860y
             "CNT,T_A[K]",  # plot CNT vs T_A
-            "CNT,dTdt", # plot CNT vs dTdt
-        "-c", "2",            # number of columns in the grid (now 3 plots)
+            "CNT,dTdt[K/min]", # plot CNT vs dTdt
+        "-c", "2",            # number of columns in the grid
         "-s", " ",            # separator in the file
         "-i", str(int(interval*1000)),  # refresh interval (ms)
         "--host", "0.0.0.0",  # Dash server host address
@@ -218,6 +282,16 @@ class PressureMeasurement:
             ctrl = float(self.lakeshore.ask("KRDG? B"))
             if abs(ctrl - target_temp) <= control_tol :
                 self.logger.info(f"Reached {target_temp}K within tolerance.")
+                # Send a text notification and snapshot images (plots 0-3)
+                media_urls = [
+                    f"{self.SNAPSHOT_BASE_URL}/snapshot/0.png?time={time.time()}",
+                    f"{self.SNAPSHOT_BASE_URL}/snapshot/1.png?time={time.time()}",
+                    f"{self.SNAPSHOT_BASE_URL}/snapshot/2.png?time={time.time()}",
+                    f"{self.SNAPSHOT_BASE_URL}/snapshot/3.png?time={time.time()}",
+                ]
+
+                self.send_whatsapp_media(media_urls)
+                self.send_whatsapp_text(f"✅ Target temperature reached: {target_temp} K.")
                 break
 
             record = self._get_measurement_record(count,out_file,interval)
@@ -234,6 +308,7 @@ class PressureMeasurement:
             start_temp: float,
             end_temp: float,
             points: int,
+            comeBack = True,
     ) -> None:
         """
         Perform an up-and-down temperature sweep with stabilization at each step.
@@ -249,7 +324,16 @@ class PressureMeasurement:
         # Generate the ascending list of 'points' temperatures from start_temp to end_temp
         forward = list(np.linspace(start_temp, end_temp, points))
         # Create the full sweep by appending the reverse of 'forward' minus the final point
-        sweep = forward + forward[::-1][1:]
+        sweep =  forward + forward[::-1][1:] if comeBack else forward
+
+        total_steps = len(sweep)
+
+        notify_indices = {
+            max(1, int(total_steps * 0.25)),
+            max(1, int(total_steps * 0.50)),
+            max(1, int(total_steps * 0.75)),
+            total_steps
+        }
 
         # Build the absolute path to the stabilizer's JSON configuration file
         cfg_path = os.path.join(BASE_DIR,'..', "UtilityFiles", "Stabilization.json")
@@ -270,12 +354,16 @@ class PressureMeasurement:
                 "T_A[K],SR860x[V]",  # plot T_A vs SR860x
                 "T_A[K],SR860y[V]",  # plot T_A vs SR860y
                 "CNT,T_A[K]",  # plot CNT vs T_A
-                "-c", "2",  # number of columns in the grid (now 3 plots)
+                "CNT,dTdt[K/min]",  # plot CNT vs dTdt
+                "-c", "2",  # number of columns in the grid
                 "-s", " ",  # separator in the file
                 "-i", str(int(self.sampling_interval*1000)),  # refresh interval (ms)
                 "--host", "0.0.0.0",  # Dash server host address
                 "--port", "8050",  # Dash server port
+                "--json", cfg_path,
             ])
+            self.send_whatsapp_text(f"🟡 Stabilization Measurement started between {start_temp} K and {end_temp} K.\n"
+                f"Number of points: {points} (round trip → total: {points * 2} points).")
             for idx, temp in enumerate(sweep, 1):
                 # Log the current stabilization step
                 self.logger.info(f"Stabilizing at {temp}K (step {idx}/{len(sweep)})")
@@ -287,11 +375,25 @@ class PressureMeasurement:
                     self.logger.error(f"Stabilization failed at {temp}K. Aborting.")
                     break
                 # Once stable, collect a measurement record
-                record = self._get_measurement_record(idx)
+                record = self._get_measurement_record(idx,out_file,0)
                 # Append the record to the output file
                 with open(out_file, "a") as f:
                     f.write(record + "\n")
                 # Log that the record was successfully written
                 self.logger.debug(f"Recorded at {temp}K")
+
+                if idx in notify_indices:
+                    percent = int(idx / total_steps * 100)
+                    self.send_whatsapp_text(f"⏳ Progress: {percent}% of stabilization steps completed.")
+
+            media_urls = [
+                f"{self.SNAPSHOT_BASE_URL}/snapshot/0.png?time={time.time()}",
+                f"{self.SNAPSHOT_BASE_URL}/snapshot/1.png?time={time.time()}",
+                f"{self.SNAPSHOT_BASE_URL}/snapshot/2.png?time={time.time()}",
+                f"{self.SNAPSHOT_BASE_URL}/snapshot/3.png?time={time.time()}",
+            ]
+            self.send_whatsapp_media(media_urls)
+            self.send_whatsapp_text(f"✅ Stabilization Measurement Done ;) !")
             process.terminate()
+
 
