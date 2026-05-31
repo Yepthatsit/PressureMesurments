@@ -1,6 +1,6 @@
 import os
 from Mesurment.PressureMeasurementv3 import PressureMeasurement
-from Stabilization.Stabilisation_atomic_jsonv2 import MeasurementConfig
+from Stabilization.Stabilisation_atomic_jsonv3 import MeasurementConfig
 
 # ─── USER CONFIG ─────────────────────────────────────────────────────────────
 base_dir        = r"D:\_EXPERIMENTS\Cryocooler\E_110_MK_2"
@@ -60,7 +60,7 @@ def main():
 
     cfg: MeasurementConfig = {
         "lakeshore_address":    "GPIB::12::INSTR",
-        "lockin_address":       "GPIB::8::INSTR",
+        "kithley_address":       "GPIB::8::INSTR",
         "slope_tolerance":      0.001,
         "intercept_tolerance":  0.001,
         "stabilization_points": 10,

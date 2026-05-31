@@ -7,11 +7,12 @@ import numpy as np
 import pandas as pd
 import subprocess
 
+from pyvisa import ResourceManager
+
 from Stabilization.Stabilisation_atomic_jsonv3 import MeasurementConfig,configure_class_logger,TemperatureStabilizer
 from typing import Optional, List
 from typing_extensions import Required
 from pymeasure.instruments.lakeshore import LakeShore331
-from pymeasure.instruments.srs import SR860
 
 
 
@@ -27,9 +28,7 @@ class PressureMeasurement:
 
     HEADER: Required[str] = (
         "T_A[K] T_B[K] Setpoint[K] "
-        "SR860x[V] SR860y[V] SR860f[Hz] "
-        "SR860sin[V] SR860theta[deg] "
-        "SR860phase[deg] SR860mag[V] "
+        "R[Ohm] "
         "HTR dTdt[K/min] CNT DateTime"
     )
 
@@ -70,8 +69,10 @@ class PressureMeasurement:
         self.logger = configure_class_logger(self.__class__.__name__)
 
         # Open instrument connections
+        self.resource_manager = ResourceManager()
+
         self.lakeshore = LakeShore331(config["lakeshore_address"])
-        self.lockin    = SR860(config["lockin_address"])
+        self.kithley    = self.resource_manager.open_resource(config["kithley_address"])
 
         # Stabilization parameters from config
         self.slope_tolerance      = config["slope_tolerance"]
@@ -103,7 +104,7 @@ class PressureMeasurement:
         :param exc_val: Exception instance if any occurred.
         :param exc_tb: Traceback if an exception occurred.
         """
-        for name, inst in (("Lakeshore", self.lakeshore), ("Lock-in", self.lockin)):
+        for name, inst in (("Lakeshore", self.lakeshore), ("Lock-in", self.kithley)):
             try:
                 inst.close()
                 self.logger.info(f"Closed {name}.")
@@ -148,43 +149,26 @@ class PressureMeasurement:
         :param count: Sequential record index (1-based).
         :returns: Space-separated string of all readings + timestamp.
         """
-        self.lockin.write("ASCL")
         # Temperatures from Lakeshore
         tA = float(self.lakeshore.ask("KRDG? A"))
         tB = float(self.lakeshore.ask("KRDG? B"))
         setpt = float(self.lakeshore.ask("SETP? 1"))
-        xarr = []
-        yarr = []
-        thetarr = []
-        phasearr = []
-        magarr = []
+        Rarr = []
         for i in range(self.LockinAvrage):
-            xarr.append(float(self.lockin.ask("OUTP? 0")))
-            yarr.append(self.lockin.y)
-            thetarr.append(self.lockin.theta)
-            phasearr.append(self.lockin.phase)
-            magarr.append(self.lockin.magnitude)
+            Rarr.append(float(self.kithley.query("MEAS:RES?")))
             time.sleep(0.1)
-        # Lock-in readings
-        x = np.mean(xarr)
-        y = np.mean(yarr)
-        freq = self.lockin.frequency
-        sin_v = self.lockin.sine_voltage
-        theta = np.mean(thetarr)
-        phase = np.mean(phasearr)
-        mag = np.mean(magarr)
-
+        # kithley-in readings
+        R = np.mean(Rarr)
         # Heater output
         heater_out = self.lakeshore.ask("HTR?")
         prevdata = pd.read_csv(filename,sep =' ')
         tempDeriiviative = np.nan
         if(interval != np.nan and prevdata['T_A[K]'].any()):
             tempDeriiviative = (tA - list(prevdata["T_A[K]"])[-1])*60/(interval + self.LockinAvrage*0.1)
+
         fields = [
             f"{tA:.6f}", f"{tB:.6f}", f"{setpt:.6f}",
-            f"{x:.12f}", f"{y:.12f}", f"{freq:.2f}",
-            f"{sin_v:.6f}", f"{theta:.6f}", f"{phase:.6f}",
-            f"{mag:.12f}", heater_out, str(tempDeriiviative),
+            f"{R:.6f}", heater_out, str(tempDeriiviative),
             str(count), self._current_timestamp()
         ]
         return " ".join(fields)
@@ -268,8 +252,7 @@ class PressureMeasurement:
         sys.executable, "./Ploting/UniversalPlotterPlotly.py",
         "-f", out_file,  # data file
         "-p",
-            "T_A[K],SR860x[V]",  # plot T_A vs SR860x
-            "T_A[K],SR860y[V]",  # plot T_A vs SR860y
+            "T_A[K],R[Ohm]",  # plot T_A vs SR860x
             "CNT,T_A[K]",  # plot CNT vs T_A
             "CNT,dTdt[K/min]", # plot CNT vs dTdt
         "-c", "2",            # number of columns in the grid
@@ -351,8 +334,7 @@ class PressureMeasurement:
                 sys.executable, "./Ploting/UniversalPlotterPlotly.py",
                 "-f", out_file,  # data file
                 "-p",
-                "T_A[K],SR860x[V]",  # plot T_A vs SR860x
-                "T_A[K],SR860y[V]",  # plot T_A vs SR860y
+                "T_A[K],R[Ohm]",  # plot T_A vs SR860x
                 "CNT,T_A[K]",  # plot CNT vs T_A
                 "CNT,dTdt[K/min]",  # plot CNT vs dTdt
                 "-c", "2",  # number of columns in the grid
