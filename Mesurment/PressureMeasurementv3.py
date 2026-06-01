@@ -73,7 +73,8 @@ class PressureMeasurement:
 
         self.lakeshore = LakeShore331(config["lakeshore_address"])
         self.kithley    = self.resource_manager.open_resource(config["kithley_address"])
-
+        self.kithley.write("*RST")
+        self.kithley.write("*CLS")
         # Stabilization parameters from config
         self.slope_tolerance      = config["slope_tolerance"]
         self.intercept_tolerance  = config["intercept_tolerance"]
@@ -155,7 +156,8 @@ class PressureMeasurement:
         setpt = float(self.lakeshore.ask("SETP? 1"))
         Rarr = []
         for i in range(self.LockinAvrage):
-            Rarr.append(float(self.kithley.query("MEAS:RES?")))
+            val = self.kithley.query("MEAS:RES?").split(",")[0].strip()
+            Rarr.append(float(val))
             time.sleep(0.1)
         # kithley-in readings
         R = np.mean(Rarr)

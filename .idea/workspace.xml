@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="">
+    <list default="true" id="0c08bc2a-3167-4f8b-9d07-a5f5bb30119f" name="Changes" comment="for kithley 6514 electromeater">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mesurment/PressureMeasurementv3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mesurment/PressureMeasurementv3.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Stabilization/Stabilisation_atomic_jsonv3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Stabilization/Stabilisation_atomic_jsonv3.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -332,7 +330,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746537681561</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="for kithley 6514 electromeater">
+      <option name="closed" value="true" />
+      <created>1780217541622</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1780217541622</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -356,7 +362,8 @@
     <MESSAGE value="Mesurment ready?" />
     <MESSAGE value="Lab changes" />
     <MESSAGE value="ploting working" />
-    <option name="LAST_COMMIT_MESSAGE" value="ploting working" />
+    <MESSAGE value="for kithley 6514 electromeater" />
+    <option name="LAST_COMMIT_MESSAGE" value="for kithley 6514 electromeater" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
