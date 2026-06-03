@@ -17,9 +17,7 @@ from flask import send_file, request, url_for
 # Constants defining the expected CSV header fields
 HEADER = (
         "T_A[K] T_B[K] Setpoint[K] "
-        "SR860x[V] SR860y[V] SR860f[Hz] "
-        "SR860sin[V] SR860theta[deg] "
-        "SR860phase[deg] SR860mag[V] "
+        "R[Ohm] "
         "HTR dTdt[K/min] CNT DateTime"
 )
 FIELD_NAMES = HEADER.split()  # List of field names parsed from HEADER
@@ -107,7 +105,7 @@ class LivePlotlyApp:
             dcc.Checklist(
                 id='card-selector',
                 options=[{'label': f, 'value': f} for f in FIELD_NAMES],
-                value=['T_A[K]', 'T_B[K]', 'SR860x[V]', 'SR860y[V]','dTdt[K/min]','Setpoint[K]'],
+                value=['T_A[K]', 'T_B[K]', 'R[Ohm]','dTdt[K/min]','Setpoint[K]'],
                 labelStyle={
                     'display': 'inline-block',
                     'margin': '5px 10px',
