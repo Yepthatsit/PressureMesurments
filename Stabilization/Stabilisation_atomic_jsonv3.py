@@ -21,7 +21,7 @@ class MeasurementConfig(TypedDict):
     Configuration for a pressure measurement run.
     """
     lakeshore_address:      Required[str]
-    kithley_address:         Required[str]
+    Hp_address:         Required[str]
     slope_tolerance:        Required[float]
     intercept_tolerance:    Required[float]
     stabilization_points:   Required[int]

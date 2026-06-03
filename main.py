@@ -60,7 +60,7 @@ def main():
 
     cfg: MeasurementConfig = {
         "lakeshore_address":    "GPIB::12::INSTR",
-        "kithley_address":       "GPIB::8::INSTR",
+        "Hp_address":       "GPIB::8::INSTR",
         "slope_tolerance":      0.001,
         "intercept_tolerance":  0.001,
         "stabilization_points": 10,

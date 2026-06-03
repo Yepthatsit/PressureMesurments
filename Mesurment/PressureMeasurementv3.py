@@ -72,9 +72,8 @@ class PressureMeasurement:
         self.resource_manager = ResourceManager()
 
         self.lakeshore = LakeShore331(config["lakeshore_address"])
-        self.kithley    = self.resource_manager.open_resource(config["kithley_address"])
-        self.kithley.write("*RST")
-        self.kithley.write("*CLS")
+        self.Hp   = self.resource_manager.open_resource(config["Hp_address"])
+        self.Hp.write("SYST:REM")
         # Stabilization parameters from config
         self.slope_tolerance      = config["slope_tolerance"]
         self.intercept_tolerance  = config["intercept_tolerance"]
@@ -105,8 +104,10 @@ class PressureMeasurement:
         :param exc_val: Exception instance if any occurred.
         :param exc_tb: Traceback if an exception occurred.
         """
-        for name, inst in (("Lakeshore", self.lakeshore), ("Lock-in", self.kithley)):
+        for name, inst in (("Lakeshore", self.lakeshore), ("Hp", self.Hp)):
             try:
+                if (name == "Hp"):
+                    inst.write("SYST:LOC")
                 inst.close()
                 self.logger.info(f"Closed {name}.")
             except Exception:
@@ -156,7 +157,7 @@ class PressureMeasurement:
         setpt = float(self.lakeshore.ask("SETP? 1"))
         Rarr = []
         for i in range(self.LockinAvrage):
-            val = self.kithley.query("MEAS:RES?").split(",")[0].strip()
+            val = self.Hp.query("MEAS:FRES?").split(",")[0].strip()
             Rarr.append(float(val))
             time.sleep(0.1)
         # kithley-in readings
